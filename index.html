@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cipherix — Application premium de sécurité et gestion de mots de passe" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Cipherix — Cybersecurity Suite</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ LOADER ═══════════════════════════════════════ -->
+<div id="loader" class="loader" aria-live="polite" role="status">
+  <div class="loader-inner">
+    <div class="loader-logo">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="28,4 52,16 52,40 28,52 4,40 4,16" fill="none" stroke="url(#lg1)" stroke-width="2"/>
+        <polygon points="28,12 44,20 44,36 28,44 12,36 12,20" fill="none" stroke="url(#lg2)" stroke-width="1" opacity="0.5"/>
+        <circle cx="28" cy="28" r="7" fill="url(#lg1)"/>
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00ffe7"/>
+            <stop offset="100%" stop-color="#006fff"/>
+          </linearGradient>
+          <linearGradient id="lg2" x1="56" y1="0" x2="0" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#006fff"/>
+            <stop offset="100%" stop-color="#00ffe7"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="loader-text">CIPHERIX</div>
+    <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+    <div class="loader-status" id="loaderStatus">Initialisation du système…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ INSTALL BANNER ═══════════════════════════════════════ -->
+<div id="installBanner" class="install-banner hidden" role="alert">
+  <span>Installer Cipherix comme application</span>
+  <button id="installBtn" class="btn-install" aria-label="Installer l'application">Installer</button>
+  <button id="installClose" class="btn-install-close" aria-label="Fermer">✕</button>
+</div>
+
+<!-- ═══════════════════════════════════════ TOAST CONTAINER ═══════════════════════════════════════ -->
+<div id="toastContainer" class="toast-container" role="region" aria-live="polite" aria-label="Notifications"></div>
+
+<!-- ═══════════════════════════════════════ APP SHELL ═══════════════════════════════════════ -->
+<div id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar" role="navigation" aria-label="Navigation principale">
+    <div class="sidebar-header">
+      <div class="brand">
+        <svg class="brand-icon" width="32" height="32" viewBox="0 0 56 56" fill="none">
+          <polygon points="28,4 52,16 52,40 28,52 4,40 4,16" fill="none" stroke="url(#navlg)" stroke-width="2"/>
+          <circle cx="28" cy="28" r="7" fill="url(#navlg)"/>
+          <defs>
+            <linearGradient id="navlg" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00ffe7"/>
+              <stop offset="100%" stop-color="#006fff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="brand-name">Cipherix</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fermer le menu" aria-expanded="true">
+        <span></span><span></span>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" aria-current="page">
+        <span class="nav-icon">⬡</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-section="generator">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label">Générateur</span>
+      </a>
+      <a href="#" class="nav-item" data-section="analyzer">
+        <span class="nav-icon">◉</span>
+        <span class="nav-label">Analyseur</span>
+      </a>
+      <a href="#" class="nav-item" data-section="crypto">
+        <span class="nav-icon">⬔</span>
+        <span class="nav-label">Cryptographie</span>
+      </a>
+      <a href="#" class="nav-item" data-section="vault">
+        <span class="nav-icon">⬟</span>
+        <span class="nav-label">Coffre-fort</span>
+      </a>
+      <a href="#" class="nav-item" data-section="lab">
+        <span class="nav-icon">⬠</span>
+        <span class="nav-label">Security Lab</span>
+      </a>
+      <a href="#" class="nav-item" data-section="export">
+        <span class="nav-icon">⬡</span>
+        <span class="nav-label">Export / Import</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="security-status">
+        <div class="status-dot"></div>
+        <span>Système sécurisé</span>
+      </div>
+      <div class="sidebar-version">v2.1.0</div>
+    </div>
+  </nav>
+
+  <!-- MAIN AREA -->
+  <div class="main-area" id="mainArea">
+
+    <!-- TOP BAR -->
+    <header class="topbar" role="banner">
+      <button class="topbar-menu-btn" id="menuBtn" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <div class="topbar-time" id="topbarTime"></div>
+        <div class="topbar-indicator" title="Chiffrement actif">
+          <span class="indicator-dot"></span>
+          <span>AES-256</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="content" id="content" tabindex="-1">
+
+      <!-- ══════════ DASHBOARD ══════════ -->
+      <section class="section active" id="sec-dashboard" aria-label="Dashboard">
+        <div class="section-hero">
+          <div class="hero-text">
+            <h1 class="hero-title">Bienvenue sur <span class="gradient-text">Cipherix</span></h1>
+            <p class="hero-sub">Suite de cybersécurité premium — Données 100% locales, chiffrement AES-256.</p>
+          </div>
+          <div class="hero-visual">
+            <div class="hex-grid" aria-hidden="true">
+              <div class="hex h1"></div><div class="hex h2"></div><div class="hex h3"></div>
+              <div class="hex h4 pulse"></div><div class="hex h5"></div><div class="hex h6"></div>
+              <div class="hex h7"></div><div class="hex h8 pulse"></div><div class="hex h9"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card" data-nav="vault">
+            <div class="stat-icon">⬟</div>
+            <div class="stat-info">
+              <div class="stat-value" id="dashVaultCount">0</div>
+              <div class="stat-label">Entrées dans le Vault</div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+          <div class="stat-card" data-nav="generator">
+            <div class="stat-icon">◈</div>
+            <div class="stat-info">
+              <div class="stat-value" id="dashGenCount">0</div>
+              <div class="stat-label">Mots de passe générés</div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+          <div class="stat-card" data-nav="crypto">
+            <div class="stat-icon">⬔</div>
+            <div class="stat-info">
+              <div class="stat-value" id="dashCryptoCount">0</div>
+              <div class="stat-label">Opérations crypto</div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">◉</div>
+            <div class="stat-info">
+              <div class="stat-value" id="dashAvgScore">—</div>
+              <div class="stat-label">Score moyen (Vault)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="dash-widget">
+            <div class="widget-header"><h2>Activité récente</h2></div>
+            <ul class="activity-list" id="activityList">
+              <li class="activity-empty">Aucune activité enregistrée.</li>
+            </ul>
+          </div>
+          <div class="dash-widget">
+            <div class="widget-header"><h2>Sécurité du Vault</h2></div>
+            <div class="vault-health" id="vaultHealth">
+              <div class="health-ring-wrap">
+                <svg class="health-ring" viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="url(#ringGrad)" stroke-width="10"
+                    stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" id="healthArc"
+                    transform="rotate(-90 60 60)"/>
+                  <defs>
+                    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#00ffe7"/>
+                      <stop offset="100%" stop-color="#006fff"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="health-score" id="healthScore">—</div>
+              </div>
+              <div class="health-labels">
+                <div class="health-row"><span class="hl-dot strong"></span><span id="hl-strong">0 forts</span></div>
+                <div class="health-row"><span class="hl-dot medium"></span><span id="hl-medium">0 moyens</span></div>
+                <div class="health-row"><span class="hl-dot weak"></span><span id="hl-weak">0 faibles</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-widget dash-tips">
+            <div class="widget-header"><h2>Conseils de sécurité</h2></div>
+            <div class="tips-list" id="tipsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ GENERATOR ══════════ -->
+      <section class="section" id="sec-generator" aria-label="Générateur de mots de passe">
+        <div class="section-header">
+          <h1>Générateur <span class="gradient-text">Intelligent</span></h1>
+          <p>Créez des mots de passe forts et mémorisables grâce à vos données personnelles.</p>
+        </div>
+
+        <div class="gen-layout">
+          <div class="gen-controls glass-card">
+            <h2 class="card-title">Paramètres</h2>
+
+            <div class="gen-tabs">
+              <button class="gen-tab active" data-mode="smart" aria-selected="true">Intelligent</button>
+              <button class="gen-tab" data-mode="random" aria-selected="false">Aléatoire</button>
+            </div>
+
+            <!-- SMART MODE -->
+            <div class="gen-panel active" id="panel-smart">
+              <div class="form-group">
+                <label for="genKeyword">Mot-clé / Pseudo</label>
+                <input type="text" id="genKeyword" placeholder="ex: Naruto, Shadow…" class="inp" maxlength="20" autocomplete="off"/>
+              </div>
+              <div class="form-group">
+                <label for="genDate">Date mémorable</label>
+                <input type="text" id="genDate" placeholder="ex: 2003, 0604…" class="inp" maxlength="10" autocomplete="off"/>
+              </div>
+              <div class="form-group">
+                <label for="genCity">Ville / Lieu</label>
+                <input type="text" id="genCity" placeholder="ex: Marrakech, Tokyo…" class="inp" maxlength="20" autocomplete="off"/>
+              </div>
+              <div class="form-group">
+                <label for="genExtra">Texte libre</label>
+                <input type="text" id="genExtra" placeholder="ex: Music, Gaming…" class="inp" maxlength="20" autocomplete="off"/>
+              </div>
+            </div>
+
+            <!-- RANDOM MODE -->
+            <div class="gen-panel" id="panel-random">
+              <div class="form-group slider-group">
+                <label for="genLength">Longueur : <strong id="genLengthVal">16</strong></label>
+                <input type="range" id="genLength" min="8" max="64" value="16" class="slider" aria-valuemin="8" aria-valuemax="64" aria-valuenow="16"/>
+              </div>
+              <div class="checkboxes-grid">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="optUppercase" checked/>
+                  <span class="check-box"></span>Majuscules (A-Z)
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="optLowercase" checked/>
+                  <span class="check-box"></span>Minuscules (a-z)
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="optNumbers" checked/>
+                  <span class="check-box"></span>Chiffres (0-9)
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="optSymbols" checked/>
+                  <span class="check-box"></span>Symboles (!@#…)
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="optAmbiguous"/>
+                  <span class="check-box"></span>Éviter ambigus (0O1l)
+                </label>
+              </div>
+              <div class="form-group">
+                <label for="optExclude">Exclure ces caractères</label>
+                <input type="text" id="optExclude" placeholder="ex: @#$" class="inp" autocomplete="off"/>
+              </div>
+            </div>
+
+            <div class="gen-btn-row">
+              <button class="btn-primary" id="btnGenerate" aria-label="Générer des mots de passe">
+                <span class="btn-icon">◈</span> Générer
+              </button>
+              <button class="btn-ghost" id="btnClearGen" aria-label="Effacer les champs">Effacer</button>
+            </div>
+          </div>
+
+          <div class="gen-results">
+            <div class="glass-card">
+              <div class="card-header-row">
+                <h2 class="card-title">Résultats</h2>
+                <button class="btn-ghost btn-sm" id="btnClearHistory" aria-label="Vider l'historique">Vider</button>
+              </div>
+              <div class="results-list" id="genResults">
+                <div class="results-placeholder">
+                  <span>◈</span>
+                  <p>Cliquez sur Générer pour créer des mots de passe.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <h2 class="card-title">Historique & Favoris</h2>
+              <div class="history-tabs">
+                <button class="htab active" data-htab="recent">Récents</button>
+                <button class="htab" data-htab="fav">Favoris ★</button>
+              </div>
+              <div class="history-list" id="historyRecent"></div>
+              <div class="history-list hidden" id="historyFav"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ ANALYZER ══════════ -->
+      <section class="section" id="sec-analyzer" aria-label="Analyseur de force">
+        <div class="section-header">
+          <h1>Analyseur de <span class="gradient-text">Force</span></h1>
+          <p>Évaluez la résistance de vos mots de passe en temps réel.</p>
+        </div>
+
+        <div class="analyzer-layout">
+          <div class="glass-card analyzer-input-card">
+            <div class="form-group password-field-wrap">
+              <label for="analyzerInput">Entrez votre mot de passe</label>
+              <div class="pw-input-wrap">
+                <input type="password" id="analyzerInput" class="inp inp-large" placeholder="Saisissez un mot de passe…" autocomplete="off" aria-describedby="analyzerHelp"/>
+                <button class="toggle-vis" id="toggleAnalyzerVis" aria-label="Afficher/Masquer le mot de passe" aria-pressed="false">
+                  <span id="eyeIcon">◉</span>
+                </button>
+              </div>
+              <div class="strength-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="analyzerBar" aria-label="Force du mot de passe">
+                <div class="strength-bar-fill" id="strengthFill"></div>
+                <div class="strength-segments">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <div id="analyzerHelp" class="strength-label-row">
+                <span class="strength-label" id="strengthLabel">Entrez un mot de passe</span>
+                <span class="strength-score" id="strengthScore"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="analyzer-grid">
+            <div class="glass-card">
+              <h2 class="card-title">Score détaillé</h2>
+              <div class="score-ring-wrap">
+                <svg class="score-ring" viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
+                    stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" id="scoreArc"
+                    transform="rotate(-90 60 60)"/>
+                  <defs>
+                    <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#00ffe7"/>
+                      <stop offset="100%" stop-color="#006fff"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="score-center">
+                  <div class="score-number" id="scoreNumber">0</div>
+                  <div class="score-max">/100</div>
+                </div>
+              </div>
+              <div class="score-criteria" id="scoreCriteria"></div>
+            </div>
+
+            <div class="glass-card">
+              <h2 class="card-title">Temps de bruteforce</h2>
+              <div class="bruteforce-display" id="bruteforceDisplay">
+                <div class="bf-time" id="bfTime">—</div>
+                <div class="bf-label">avec 10 milliards de tentatives/seconde</div>
+              </div>
+              <div class="bf-details" id="bfDetails"></div>
+            </div>
+
+            <div class="glass-card analyzer-full">
+              <h2 class="card-title">Analyse & Conseils</h2>
+              <div class="analysis-feedback" id="analysisFeedback">
+                <div class="feedback-placeholder">Saisissez un mot de passe pour commencer l'analyse.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ CRYPTO ══════════ -->
+      <section class="section" id="sec-crypto" aria-label="Laboratoire de cryptographie">
+        <div class="section-header">
+          <h1>Laboratoire <span class="gradient-text">Crypto</span></h1>
+          <p>Chiffrez, déchiffrez et hachez vos données avec des algorithmes standards.</p>
+        </div>
+
+        <div class="crypto-layout">
+          <div class="glass-card crypto-controls">
+            <h2 class="card-title">Opération</h2>
+            <div class="method-tabs" role="tablist" aria-label="Méthode de chiffrement">
+              <button class="method-tab active" data-method="aes" role="tab" aria-selected="true">AES-GCM</button>
+              <button class="method-tab" data-method="sha256" role="tab" aria-selected="false">SHA-256</button>
+              <button class="method-tab" data-method="base64" role="tab" aria-selected="false">Base64</button>
+              <button class="method-tab" data-method="caesar" role="tab" aria-selected="false">César</button>
+              <button class="method-tab" data-method="rot13" role="tab" aria-selected="false">ROT-13</button>
+            </div>
+
+            <div class="method-desc" id="methodDesc"></div>
+
+            <div class="form-group" id="cryptoKeyGroup">
+              <label for="cryptoKey">Clé / Passphrase (AES)</label>
+              <div class="pw-input-wrap">
+                <input type="password" id="cryptoKey" class="inp" placeholder="Entrez votre passphrase…" autocomplete="off"/>
+                <button class="toggle-vis" id="toggleCryptoKey" aria-label="Afficher la clé">◉</button>
+              </div>
+            </div>
+
+            <div class="form-group" id="caesarShiftGroup" style="display:none">
+              <label for="caesarShift">Décalage (César) : <strong id="caesarShiftVal">3</strong></label>
+              <input type="range" id="caesarShift" min="1" max="25" value="3" class="slider"/>
+            </div>
+
+            <div class="form-group">
+              <label for="cryptoInput">Texte source</label>
+              <textarea id="cryptoInput" class="inp inp-textarea" placeholder="Entrez le texte à traiter…" rows="5" aria-label="Texte source"></textarea>
+            </div>
+
+            <div class="crypto-action-row">
+              <button class="btn-primary" id="btnEncrypt" aria-label="Chiffrer">Chiffrer</button>
+              <button class="btn-secondary" id="btnDecrypt" aria-label="Déchiffrer">Déchiffrer</button>
+              <button class="btn-secondary" id="btnHash" aria-label="Hacher">Hacher</button>
+            </div>
+          </div>
+
+          <div class="crypto-output-col">
+            <div class="glass-card">
+              <div class="card-header-row">
+                <h2 class="card-title">Résultat</h2>
+                <div class="crypto-output-actions">
+                  <button class="btn-ghost btn-sm" id="btnCopyCrypto" aria-label="Copier">Copier</button>
+                  <button class="btn-ghost btn-sm" id="btnDownloadCrypto" aria-label="Télécharger">Télécharger</button>
+                  <button class="btn-ghost btn-sm" id="btnClearCrypto" aria-label="Effacer">Effacer</button>
+                </div>
+              </div>
+              <div class="crypto-result-wrap">
+                <textarea id="cryptoOutput" class="inp inp-textarea crypto-output-area" readonly rows="6" placeholder="Le résultat apparaîtra ici…" aria-label="Résultat du chiffrement"></textarea>
+              </div>
+              <div class="crypto-meta" id="cryptoMeta"></div>
+            </div>
+
+            <div class="glass-card">
+              <h2 class="card-title">Historique crypto</h2>
+              <div class="crypto-history" id="cryptoHistory">
+                <div class="history-empty">Aucune opération effectuée.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ VAULT ══════════ -->
+      <section class="section" id="sec-vault" aria-label="Coffre-fort sécurisé">
+        <div class="section-header">
+          <h1>Coffre-fort <span class="gradient-text">Sécurisé</span></h1>
+          <p>Toutes vos données chiffrées localement. Zéro cloud.</p>
+        </div>
+
+        <!-- VAULT LOCK SCREEN -->
+        <div id="vaultLockScreen" class="vault-lock">
+          <div class="lock-card glass-card">
+            <div class="lock-icon-wrap">
+              <div class="lock-icon" id="lockIconAnim">⬟</div>
+            </div>
+            <h2>Vault Verrouillé</h2>
+            <p>Entrez votre PIN pour accéder à vos données chiffrées.</p>
+            <div class="pin-display" id="pinDisplay" aria-live="polite">
+              <span class="pin-dot" id="pd0"></span>
+              <span class="pin-dot" id="pd1"></span>
+              <span class="pin-dot" id="pd2"></span>
+              <span class="pin-dot" id="pd3"></span>
+            </div>
+            <div class="pin-grid" id="pinGrid" aria-label="Clavier PIN">
+              <button class="pin-btn" data-digit="1" aria-label="1">1</button>
+              <button class="pin-btn" data-digit="2" aria-label="2">2</button>
+              <button class="pin-btn" data-digit="3" aria-label="3">3</button>
+              <button class="pin-btn" data-digit="4" aria-label="4">4</button>
+              <button class="pin-btn" data-digit="5" aria-label="5">5</button>
+              <button class="pin-btn" data-digit="6" aria-label="6">6</button>
+              <button class="pin-btn" data-digit="7" aria-label="7">7</button>
+              <button class="pin-btn" data-digit="8" aria-label="8">8</button>
+              <button class="pin-btn" data-digit="9" aria-label="9">9</button>
+              <button class="pin-btn pin-clear" id="pinClear" aria-label="Effacer">⌫</button>
+              <button class="pin-btn" data-digit="0" aria-label="0">0</button>
+              <button class="pin-btn pin-submit" id="pinSubmit" aria-label="Valider">✓</button>
+            </div>
+            <div class="pin-error" id="pinError" role="alert"></div>
+            <button class="btn-ghost btn-sm" id="btnResetVault">Réinitialiser le Vault</button>
+          </div>
+        </div>
+
+        <!-- VAULT CONTENT -->
+        <div id="vaultContent" class="vault-content hidden">
+          <div class="vault-toolbar">
+            <div class="vault-search-wrap">
+              <input type="search" id="vaultSearch" class="inp" placeholder="Rechercher…" aria-label="Rechercher dans le vault"/>
+            </div>
+            <div class="vault-filters">
+              <select id="vaultCategoryFilter" class="inp inp-select" aria-label="Filtrer par catégorie">
+                <option value="">Toutes catégories</option>
+                <option value="web">Web</option>
+                <option value="app">Applications</option>
+                <option value="bank">Bancaire</option>
+                <option value="email">Email</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="btnAddEntry" aria-label="Ajouter une entrée">+ Ajouter</button>
+            <button class="btn-ghost" id="btnLockVault" aria-label="Verrouiller le vault">🔒 Verrouiller</button>
+          </div>
+
+          <div class="vault-grid" id="vaultGrid"></div>
+          <div class="vault-empty hidden" id="vaultEmpty">
+            <span>⬟</span>
+            <p>Aucune entrée dans le vault. Cliquez sur « Ajouter » pour commencer.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ SECURITY LAB ══════════ -->
+      <section class="section" id="sec-lab" aria-label="Security Lab">
+        <div class="section-header">
+          <h1>Security <span class="gradient-text">Lab</span></h1>
+          <p>Analysez et visualisez la robustesse de vos données de sécurité.</p>
+        </div>
+
+        <div class="lab-layout">
+          <div class="glass-card lab-terminal">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="tdot red"></span><span class="tdot yellow"></span><span class="tdot green"></span>
+              </div>
+              <div class="terminal-title">cipherix-lab ~ bruteforce-sim</div>
+            </div>
+            <div class="terminal-body" id="terminalBody" aria-live="polite" aria-label="Simulation de bruteforce">
+              <div class="term-line term-prompt">$ init bruteforce_simulation</div>
+            </div>
+            <div class="terminal-input-row">
+              <label for="labPassword" class="term-prompt-label">$</label>
+              <input type="text" id="labPassword" class="terminal-input" placeholder="Entrez un mot de passe à simuler…" autocomplete="off" aria-label="Mot de passe pour simulation"/>
+              <button class="btn-primary btn-sm" id="btnRunSim" aria-label="Lancer la simulation">Run</button>
+            </div>
+          </div>
+
+          <div class="lab-stats-grid">
+            <div class="glass-card lab-stat-card">
+              <div class="lab-stat-label">Entropie</div>
+              <div class="lab-stat-value" id="labEntropy">— bits</div>
+              <div class="lab-stat-bar"><div class="lab-bar-fill" id="labEntropyBar"></div></div>
+            </div>
+            <div class="glass-card lab-stat-card">
+              <div class="lab-stat-label">Espace de clés</div>
+              <div class="lab-stat-value" id="labKeyspace">—</div>
+            </div>
+            <div class="glass-card lab-stat-card">
+              <div class="lab-stat-label">Longueur</div>
+              <div class="lab-stat-value" id="labLength">— chars</div>
+              <div class="lab-stat-bar"><div class="lab-bar-fill" id="labLengthBar"></div></div>
+            </div>
+            <div class="glass-card lab-stat-card">
+              <div class="lab-stat-label">Charset utilisé</div>
+              <div class="lab-stat-value" id="labCharset">—</div>
+            </div>
+          </div>
+
+          <div class="glass-card lab-comparison">
+            <h2 class="card-title">Comparaison de sécurité</h2>
+            <div class="comparison-table" id="comparisonTable"></div>
+          </div>
+
+          <div class="glass-card lab-scan">
+            <h2 class="card-title">Scan de patterns</h2>
+            <div class="scan-animation" id="scanAnim" aria-hidden="true">
+              <div class="scan-line"></div>
+              <div class="scan-grid">
+                <div class="sg-cell" id="sgc1">A1</div><div class="sg-cell" id="sgc2">B3</div>
+                <div class="sg-cell" id="sgc3">C7</div><div class="sg-cell" id="sgc4">D2</div>
+                <div class="sg-cell" id="sgc5">E9</div><div class="sg-cell" id="sgc6">F4</div>
+                <div class="sg-cell" id="sgc7">G6</div><div class="sg-cell" id="sgc8">H8</div>
+                <div class="sg-cell" id="sgc9">I0</div><div class="sg-cell" id="sgc10">J5</div>
+                <div class="sg-cell" id="sgc11">K3</div><div class="sg-cell" id="sgc12">L1</div>
+              </div>
+            </div>
+            <div class="patterns-result" id="patternsResult">
+              <div class="pattern-placeholder">Lancez une simulation pour analyser les patterns.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ EXPORT / IMPORT ══════════ -->
+      <section class="section" id="sec-export" aria-label="Export et Import">
+        <div class="section-header">
+          <h1>Export <span class="gradient-text">/ Import</span></h1>
+          <p>Sauvegardez et restaurez vos données chiffrées en toute sécurité.</p>
+        </div>
+
+        <div class="export-layout">
+          <div class="glass-card">
+            <h2 class="card-title">Exporter les données</h2>
+            <p class="card-desc">Exportez le contenu chiffré de votre vault et de vos préférences dans un fichier JSON sécurisé.</p>
+            <div class="export-options">
+              <label class="checkbox-item">
+                <input type="checkbox" id="expVault" checked/><span class="check-box"></span>Vault (mots de passe)
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="expHistory" checked/><span class="check-box"></span>Historique génération
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="expCryptoHist"/><span class="check-box"></span>Historique crypto
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="exportPassphrase">Passphrase d'export (optionnel)</label>
+              <input type="password" id="exportPassphrase" class="inp" placeholder="Sécurisez votre export avec une passphrase…" autocomplete="off"/>
+            </div>
+            <button class="btn-primary" id="btnExport" aria-label="Exporter les données">
+              ↓ Exporter JSON chiffré
+            </button>
+            <div class="export-preview glass-inner" id="exportPreview" style="display:none"></div>
+          </div>
+
+          <div class="glass-card">
+            <h2 class="card-title">Importer des données</h2>
+            <p class="card-desc">Restaurez vos données depuis un fichier d'export Cipherix.</p>
+            <div class="file-drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Zone de dépôt de fichier">
+              <span class="drop-icon">⬡</span>
+              <p>Glissez votre fichier ici<br/><small>ou cliquez pour sélectionner</small></p>
+              <input type="file" id="importFileInput" accept=".json" class="file-input-hidden" aria-hidden="true"/>
+            </div>
+            <div class="form-group" id="importPassGroup" style="display:none">
+              <label for="importPassphrase">Passphrase d'import</label>
+              <input type="password" id="importPassphrase" class="inp" placeholder="Entrez la passphrase utilisée lors de l'export…" autocomplete="off"/>
+            </div>
+            <button class="btn-primary" id="btnImport" aria-label="Importer les données" style="display:none">
+              ↑ Importer & Restaurer
+            </button>
+            <div class="import-status" id="importStatus"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MODALS ═══════════════════════════════════════ -->
+
+<!-- VAULT ADD/EDIT MODAL -->
+<div class="modal-overlay hidden" id="vaultModal" role="dialog" aria-modal="true" aria-labelledby="vaultModalTitle">
+  <div class="modal glass-card">
+    <div class="modal-header">
+      <h2 id="vaultModalTitle">Ajouter une entrée</h2>
+      <button class="modal-close" id="vaultModalClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="entryTitle">Titre *</label>
+        <input type="text" id="entryTitle" class="inp" placeholder="ex: Gmail, Netflix…" maxlength="60" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label for="entryUsername">Identifiant / Email</label>
+        <input type="text" id="entryUsername" class="inp" placeholder="user@example.com" maxlength="100" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label for="entryPassword">Mot de passe *</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="entryPassword" class="inp" placeholder="Mot de passe…" autocomplete="off"/>
+          <button class="toggle-vis" id="toggleEntryPw" aria-label="Afficher le mot de passe">◉</button>
+        </div>
+        <div class="mini-strength" id="entryStrengthBar"></div>
+      </div>
+      <div class="form-group">
+        <label for="entryUrl">URL du site</label>
+        <input type="url" id="entryUrl" class="inp" placeholder="https://example.com" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label for="entryCategory">Catégorie</label>
+        <select id="entryCategory" class="inp inp-select">
+          <option value="web">Web</option>
+          <option value="app">Applications</option>
+          <option value="bank">Bancaire</option>
+          <option value="email">Email</option>
+          <option value="other">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="entryNotes">Notes</label>
+        <textarea id="entryNotes" class="inp inp-textarea" rows="3" placeholder="Notes optionnelles…" maxlength="500"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="btnCancelVault">Annuler</button>
+      <button class="btn-primary" id="btnSaveEntry">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+  <div class="modal glass-card modal-sm">
+    <div class="modal-header">
+      <h2 id="confirmModalTitle">Confirmation</h2>
+      <button class="modal-close" id="confirmClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">Êtes-vous sûr ?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="confirmCancel">Annuler</button>
+      <button class="btn-danger" id="confirmOk">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PIN MODAL -->
+<div class="modal-overlay hidden" id="setPinModal" role="dialog" aria-modal="true" aria-labelledby="setPinTitle">
+  <div class="modal glass-card modal-sm">
+    <div class="modal-header">
+      <h2 id="setPinTitle">Créer un PIN Vault</h2>
+    </div>
+    <div class="modal-body">
+      <p>Choisissez un PIN à 4 chiffres pour protéger votre coffre-fort.</p>
+      <div class="pin-display pin-display-sm" id="setPinDisplay">
+        <span class="pin-dot" id="spd0"></span><span class="pin-dot" id="spd1"></span>
+        <span class="pin-dot" id="spd2"></span><span class="pin-dot" id="spd3"></span>
+      </div>
+      <div class="pin-grid" id="setPinGrid">
+        <button class="pin-btn" data-digit="1">1</button>
+        <button class="pin-btn" data-digit="2">2</button>
+        <button class="pin-btn" data-digit="3">3</button>
+        <button class="pin-btn" data-digit="4">4</button>
+        <button class="pin-btn" data-digit="5">5</button>
+        <button class="pin-btn" data-digit="6">6</button>
+        <button class="pin-btn" data-digit="7">7</button>
+        <button class="pin-btn" data-digit="8">8</button>
+        <button class="pin-btn" data-digit="9">9</button>
+        <button class="pin-btn pin-clear" id="setPinClear">⌫</button>
+        <button class="pin-btn" data-digit="0">0</button>
+        <button class="pin-btn pin-submit" id="setPinSubmit">✓</button>
+      </div>
+      <div class="pin-error" id="setPinError" role="alert"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
